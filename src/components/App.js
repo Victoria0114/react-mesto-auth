@@ -43,6 +43,7 @@ export default function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    tokenCheck();
     api
       .getUserInfo()
       .then((data) => {
@@ -231,6 +232,14 @@ export default function App() {
     setLoggedIn(false);
     navigate('/sign-in');
   }
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem("jwt");
+    checkToken(jwt).then((response) => {
+      setUserEmail(response.data.email);
+      setLoggedIn(true);      
+    }).then(() => navigate("/"))
+    .catch((err) => console.error(err));
+  }
 
   return (
     <div className="root">
@@ -259,6 +268,7 @@ export default function App() {
                 />
               } 
             />
+            <Route path="/" element={<ProtectedRoute loggedIn={loggedIn} />}></Route>
             <Route 
               path="/" 
               element={
