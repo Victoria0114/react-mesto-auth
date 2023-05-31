@@ -14,8 +14,7 @@ export const register = (password, email) => {
     },
     body: JSON.stringify({ password, email })
   })
-  .then(isOk)
-  .catch((err) => console.log(err));
+  .then(isOk);
 };
 
 export const authorization = (password, email) => {
@@ -27,23 +26,26 @@ export const authorization = (password, email) => {
     body: JSON.stringify({ password, email })
   })
   .then(isOk)
-  .catch(err => console.log(err))
 };
 
 export const checkToken = (token) => {
-    return fetch(`${BASE_URL}/users/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        "Authorization" : `Bearer ${token}`
-      }
-    })
-    .then(isOk)
-    // .then((data) => {
-    //   if (data.user){
-    //     localStorage.setItem('jwt', data.jwt);
-    //     return data;
-    //   }
-    // }) 
-    // .catch(err => console.log(err))
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  }).then(isOk);
 };
+// export function request(url, options) {
+//   // принимает два аргумента: урл и объект опций, как и `fetch`
+//   return fetch(url, options).then(isOk)
+// }
+
+// И теперь просто нужно заменить все fetch на request 
+// и убрать дублирование проверки на ok. 
+
+// Все остальное будет без изменений. Код станет чище
+// И даже можно поместить внутрь baseUrl, 
+// чтобы не дублировать его в каждом запросе. 
+// Тогда нужно будет передавать просто endpoint в вызов

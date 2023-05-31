@@ -35,12 +35,33 @@ export default function App() {
   const [cards, setCards] = useState([]);
   const [registrated, setRegistrated] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState("email@mail.ru");
+  const [userEmail, setUserEmail] = useState("email@yandex.ru");
   const [authorizationData, setAuthorizationData] = useState({
     password: "",
     email: "",
   });
   const navigate = useNavigate();
+
+  const isModalWindowOpen = isEditAvatarPopupOpen 
+  || isEditProfilePopupOpen 
+  || isAddPlacePopupOpen 
+  || selectedCard.link 
+  || isInfoTooltipOpen;
+
+  useEffect(() => {
+    function closeByEscape(evt) {
+      if(evt.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+    
+    if(isModalWindowOpen) {
+      document.addEventListener('keydown', closeByEscape);
+      return () => {
+        document.removeEventListener('keydown', closeByEscape);
+      }
+    }
+  }, [isModalWindowOpen])
 
   useEffect(() => {
     tokenCheck();
@@ -61,6 +82,8 @@ export default function App() {
       .catch((error) => console.log(error));
   }, []);
 
+  //
+
   function handleCardLike(card) {
     const isLiked = card.likes.some((item) => item._id === currentUser._id);
     api
@@ -74,49 +97,7 @@ export default function App() {
         console.log(err);
       });
   }
-  // const handleCardLike = (card) => {
-  //   const isLiked = card.likes.some((i) => i._id === currentUser._id);
-  //   if (isLiked) {
-  //     api
-  //     .deleteLike(card.cardId)
-  //     .then((data) => {
-  //       setCards((state) =>
-  //         state.map((c) => (c._id === card.cardId ? data : c))
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   } else {
-  //     api
-  //     .putLike(card.cardId)
-  //     .then((data) => {
-  //       setCards((state) =>
-  //         state.map((item) => (item._id === card.cardId ? data : item))
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   }
-  // api
-  //   .changeLikeCardStatus(card._id, !isLiked)
-  //   .then((newCard) => {
-  //     setCards((state) =>
-  //       state.map((c) => c._id === card._id ? newCard : c));})
-  //   .catch((error) => {
-  //     console.log(error);
-  // });
-  //}
-
-  // const handleCardDelete = (card) => {
-  //   api
-  //     .deleteCard(card.card_id)
-  //     .then(() => {
-  //       setCards((cards) => cards.filter((item) => item._id !== card._id));
-  //     })
-  //     .catch((error) => console.log(error));
-  // }
+ 
   function handleCardDelete(card) {
     api
       .deleteCard(card._id)
@@ -178,11 +159,35 @@ export default function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setSelectedCard({ name: "", link: "" });
+    setIsInfoTooltipOpen(false);
   }
   const handleOverlay = (e) => {
     if (e.target === e.currentTarget) {
       closeAllPopups();
     }
+  }
+ 
+  const handleChangeInput = (event) => {
+    const { name, value } = event.target;
+    setAuthorizationData((oldData) => ({
+      ...oldData,
+      [name]: value,
+    }));
+  };
+
+  const logOut = () => {
+    localStorage.removeItem("jwt");
+    setLoggedIn(false);
+    navigate('/sign-in');
+  }
+  
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem("jwt");
+    checkToken(jwt).then((response) => {
+      setUserEmail(response.data.email);
+      setLoggedIn(true);      
+    }).then(() => navigate("/"))
+    .catch((err) => console.error(err));
   }
 
   const handleRegister = () => {
@@ -218,28 +223,6 @@ export default function App() {
       })
       .catch((err) => console.error(err));
   };
-  
-  const handleChangeInput = (event) => {
-    const { name, value } = event.target;
-    setAuthorizationData((oldData) => ({
-      ...oldData,
-      [name]: value,
-    }));
-  };
-
-  const logOut = () => {
-    localStorage.removeItem("jwt");
-    setLoggedIn(false);
-    navigate('/sign-in');
-  }
-  const tokenCheck = () => {
-    const jwt = localStorage.getItem("jwt");
-    checkToken(jwt).then((response) => {
-      setUserEmail(response.data.email);
-      setLoggedIn(true);      
-    }).then(() => navigate("/"))
-    .catch((err) => console.error(err));
-  }
 
   return (
     <div className="root">
@@ -268,7 +251,7 @@ export default function App() {
                 />
               } 
             />
-            <Route path="/" element={<ProtectedRoute loggedIn={loggedIn} />}></Route>
+            <Route path="/" element={<ProtectedRoute loggedIn={loggedIn} />}>
             <Route 
               path="/" 
               element={
@@ -290,9 +273,7 @@ export default function App() {
                   />
                 </>
               } 
-            />
-            {/* <Route path="/" element={<Dashboard />} />
-            <Route path="/sign-up" element={<Dashboard />} /> */}
+            /></Route>
           </Routes>
           <Footer />
 
@@ -321,11 +302,16 @@ export default function App() {
             name="delete-card"
             title="Вы уверены?"
             buttonText="Да"
+            isOpen={false}
             onClose={closeAllPopups}
             onClick={handleOverlay}
           ></PopupWithForm>
 
-          <ImagePopup card={selectedCard} onClose={closeAllPopups}></ImagePopup>
+          <ImagePopup 
+            card={selectedCard} 
+            onClose={closeAllPopups} 
+            onClick={handleOverlay}
+          ></ImagePopup>
 
           <InfoTooltip
             name="info"
