@@ -20,6 +20,7 @@ import InfoTooltip from "./InfoTooltip";
 import { authorization, register, checkToken } from "../utils/auth";
 
 export default function App() {
+  const navigate = useNavigate();
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
@@ -40,13 +41,9 @@ export default function App() {
     password: "",
     email: "",
   });
-  const navigate = useNavigate();
-
-  const isModalWindowOpen = isEditAvatarPopupOpen 
-  || isEditProfilePopupOpen 
-  || isAddPlacePopupOpen 
-  || selectedCard.link 
-  || isInfoTooltipOpen;
+  
+  const isModalWindowOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link || isInfoTooltipOpen;
+  console.log()
 
   useEffect(() => {
     function closeByEscape(evt) {
@@ -82,8 +79,62 @@ export default function App() {
       .catch((error) => console.log(error));
   }, []);
 
-  //
+  function handleOverlay(evt) {
+    if (evt.target === evt.currentTarget) {
+      console.log('1234567')
+      closeAllPopups()
+    }
+  }
 
+  const logOut = () => {
+    localStorage.removeItem("jwt");
+    setLoggedIn(false);
+    navigate('/sign-in');
+  }
+  
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem("jwt");
+    checkToken(jwt).then((response) => {
+      setUserEmail(response.data.email);
+      setLoggedIn(true);      
+    }).then(() => navigate("/"))
+    .catch((err) => console.error(err));
+  }
+
+  const handleRegister = () => {
+    setRegistrated(false);
+    const { password, email } = authorizationData;
+    register(password, email)
+      .then((response) => {
+        if (response.data.email) {
+          setRegistrated(true);
+          navigate("/sign-in");
+        }
+      })
+      .then(() => {
+        setAuthorizationData({ password: "", email: "" });
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsInfoTooltipOpen(true));
+  };
+
+  const handleLogin = () => {
+    const { password, email } = authorizationData;
+    authorization(password, email)
+      .then((response) => {
+        if (response.token) {
+          localStorage.setItem("jwt", response.token);
+          setUserEmail(email);
+          setLoggedIn(true);
+          navigate("/");
+        }
+      })
+      .then(() => {
+        setAuthorizationData({ password: "", email: "" });
+      })
+      .catch((err) => console.error(err));
+  };
+  //
   function handleCardLike(card) {
     const isLiked = card.likes.some((item) => item._id === currentUser._id);
     api
@@ -137,7 +188,7 @@ export default function App() {
       .then(() => closeAllPopups())
       .catch((error) => console.log(error));
   };
-
+  //
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
   }
@@ -161,12 +212,7 @@ export default function App() {
     setSelectedCard({ name: "", link: "" });
     setIsInfoTooltipOpen(false);
   }
-  const handleOverlay = (e) => {
-    if (e.target === e.currentTarget) {
-      closeAllPopups();
-    }
-  }
- 
+  
   const handleChangeInput = (event) => {
     const { name, value } = event.target;
     setAuthorizationData((oldData) => ({
@@ -174,56 +220,7 @@ export default function App() {
       [name]: value,
     }));
   };
-
-  const logOut = () => {
-    localStorage.removeItem("jwt");
-    setLoggedIn(false);
-    navigate('/sign-in');
-  }
-  
-  const tokenCheck = () => {
-    const jwt = localStorage.getItem("jwt");
-    checkToken(jwt).then((response) => {
-      setUserEmail(response.data.email);
-      setLoggedIn(true);      
-    }).then(() => navigate("/"))
-    .catch((err) => console.error(err));
-  }
-
-  const handleRegister = () => {
-    setRegistrated(false);
-    const { password, email } = authorizationData;
-    register(password, email)
-      .then((response) => {
-        if (response.data.email) {
-          setRegistrated(true);
-          navigate("/sign-in");
-        }
-      })
-      .then(() => {
-        setAuthorizationData({ password: "", email: "" });
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsInfoTooltipOpen(true));
-  };
-
-  const handleLogin = () => {
-    const { password, email } = authorizationData;
-    authorization(password, email)
-      .then((response) => {
-        if (response.token) {
-          localStorage.setItem("jwt", response.token);
-          setUserEmail(email);
-          setLoggedIn(true);
-          navigate("/");
-        }
-      })
-      .then(() => {
-        setAuthorizationData({ password: "", email: "" });
-      })
-      .catch((err) => console.error(err));
-  };
-
+  //
   return (
     <div className="root">
       <div className="page">
@@ -281,21 +278,21 @@ export default function App() {
             isOpen={isEditProfilePopupOpen}
             onClose={closeAllPopups}
             onUpdateUser={handleUpdateUser}
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
           />
 
           <AddPlacePopup
             isOpen={isAddPlacePopupOpen}
             onClose={closeAllPopups}
             onAddPlace={handleAddPlaceSubmit}
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
           />
 
           <EditAvatarPopup
             isOpen={isEditAvatarPopupOpen}
             onClose={closeAllPopups}
             onUpdateAvatar={handleUpdateAvatar}
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
           />
 
           <PopupWithForm
@@ -304,13 +301,13 @@ export default function App() {
             buttonText="Да"
             isOpen={false}
             onClose={closeAllPopups}
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
           ></PopupWithForm>
 
           <ImagePopup 
             card={selectedCard} 
             onClose={closeAllPopups} 
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
           ></ImagePopup>
 
           <InfoTooltip
@@ -318,7 +315,7 @@ export default function App() {
             containerType="infoTooltip"
             isOpen={isInfoTooltipOpen}
             onClose={closeAllPopups}
-            onClick={handleOverlay}
+            onCloseOverlay={handleOverlay}
             isOk={registrated}
           />
 
