@@ -8,13 +8,13 @@ function PopupWithForm({
   children,
   buttonText,
   onSubmit,
-  onCloseOverlay,
+  // onCloseOverlay,
 }) {
   return (
     <>
+     <div className="root" onClick={onClose}>
       <div
-        className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}
-        onClick={onCloseOverlay}
+        className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`} 
       >
         <div className="popup__container"
         >
@@ -42,6 +42,7 @@ function PopupWithForm({
           </form>
         </div>
       </div>
+     </div>
     </>
   );
 }
