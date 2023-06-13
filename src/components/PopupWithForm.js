@@ -8,16 +8,19 @@ function PopupWithForm({
   children,
   buttonText,
   onSubmit,
-  // onCloseOverlay,
+  //onCloseOverlay,
 }) {
+  function handleOverlay(evt) {
+    if (evt.target === evt.currentTarget) {
+      console.log('1567')
+      onClose(evt)
+    }
+  }
   return (
     <>
-     <div className="root" onClick={onClose}>
-      <div
-        className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`} 
-      >
-        <div className="popup__container"
-        >
+      <div className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}>
+        <div className="popup__overlay" onClick={handleOverlay}>
+        <div className="popup__container">
           <button
             className={`popup__close popup__close_type_${name}`}
             type="button"
@@ -41,8 +44,8 @@ function PopupWithForm({
             </button>
           </form>
         </div>
+        </div>
       </div>
-     </div>
     </>
   );
 }

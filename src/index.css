@@ -72,8 +72,9 @@
 
 @import url(./blocks/popup/__img/popup__img.css);
 @import url(./blocks/popup/__caption/popup__caption.css);
-@import url(./blocks/popup/__hidden-label/popup__hidden-label.css)
+@import url(./blocks/popup/__hidden-label/popup__hidden-label.css);
 
+@import url(./blocks/popup/__overlay/popup__overlay.css);
 /*  form error  */
 @import url(./blocks/popup/__edit-form/_type/popup__edit-form_type_error.css);
 @import url(./blocks/popup/__span/popup__span_error.css);

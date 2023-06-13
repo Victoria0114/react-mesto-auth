@@ -43,7 +43,6 @@ export default function App() {
   });
   
   const isModalWindowOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link || isInfoTooltipOpen;
-  console.log()
 
   useEffect(() => {
     function closeByEscape(evt) {
@@ -56,6 +55,22 @@ export default function App() {
       document.addEventListener('keydown', closeByEscape);
       return () => {
         document.removeEventListener('keydown', closeByEscape);
+      }
+    }
+  }, [isModalWindowOpen])
+
+  useEffect(() => {
+    function handleOverlay(evt) {
+      if (evt.target === evt.currentTarget) {
+        console.log('click')
+        closeAllPopups()
+      }
+    }
+    
+    if(isModalWindowOpen) {
+      document.addEventListener('click', handleOverlay);
+      return () => {
+        document.removeEventListener('click', handleOverlay);
       }
     }
   }, [isModalWindowOpen])
