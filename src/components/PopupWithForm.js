@@ -17,10 +17,9 @@ function PopupWithForm({
     }
   }
   return (
-    <>
-      <div className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}>
-        <div className="popup__overlay" onClick={handleOverlay}>
-        <div className="popup__container">
+    <div className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}>
+      <div className="popup__overlay" onClick={handleOverlay}>
+      <div className="popup__container">
           <button
             className={`popup__close popup__close_type_${name}`}
             type="button"
@@ -38,15 +37,14 @@ function PopupWithForm({
               className={`popup__save popup__save_type_${name}`}
               type="submit"
               aria-label="Сохранить"
-              onClick={onClose}
+              // onClick={onClose}
             >
               {buttonText}
             </button>
           </form>
-        </div>
-        </div>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 export default PopupWithForm;

@@ -59,21 +59,21 @@ export default function App() {
     }
   }, [isModalWindowOpen])
 
-  useEffect(() => {
-    function handleOverlay(evt) {
-      if (evt.target === evt.currentTarget) {
-        console.log('click')
-        closeAllPopups()
-      }
-    }
+  // useEffect(() => {
+  //   function handleOverlay(evt) {
+  //     if (evt.target === evt.currentTarget) {
+  //       console.log('click')
+  //       closeAllPopups()
+  //     }
+  //   }
     
-    if(isModalWindowOpen) {
-      document.addEventListener('click', handleOverlay);
-      return () => {
-        document.removeEventListener('click', handleOverlay);
-      }
-    }
-  }, [isModalWindowOpen])
+  //   if(isModalWindowOpen) {
+  //     document.addEventListener('click', handleOverlay);
+  //     return () => {
+  //       document.removeEventListener('click', handleOverlay);
+  //     }
+  //   }
+  // }, [isModalWindowOpen])
 
   useEffect(() => {
     tokenCheck();
@@ -317,14 +317,14 @@ export default function App() {
             isOpen={false}
             onClose={closeAllPopups}
             onCloseOverlay={handleOverlay}
-          ></PopupWithForm>
+          />
 
           <ImagePopup 
             card={selectedCard} 
             onClose={closeAllPopups} 
             onCloseOverlay={handleOverlay}
-          ></ImagePopup>
-
+          />
+          
           <InfoTooltip
             name="info"
             containerType="infoTooltip"

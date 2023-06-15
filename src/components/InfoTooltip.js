@@ -11,7 +11,7 @@ const InfoTooltip = (props) => {
       onClick={props.onClick}
     >
       <div className={`popup__container ${props.containerType}`}>
-        <img className="popup__img" alt="" src={ props.isOk ? imageSuccessPath : imageErrorPath } />
+        <img className="popup__img" alt={props.alt} src={ props.isOk ? imageSuccessPath : imageErrorPath } />
         <span className="popup__caption">{ props.isOk ? "Вы успешно зарегистрировались!" : "Что-то пошло не так! Попробуйте ещё раз." }</span>
         <button
           className={`popup__close popup__close_type_${props.name}`}
